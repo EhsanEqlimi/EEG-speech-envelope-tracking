@@ -25,7 +25,7 @@ RectSpeech=abs(SpeechSig);
 EnvRect=lowpass(RectSpeech,f_LP,SpeechFs);
 
 SqSpeech=SpeechSig.^2;
-EnvSqL=lowpass(SqSpeech,f_LP,SpeechFs);
+EnvSq=lowpass(SqSpeech,f_LP,SpeechFs);
 
 AbsHilbertSpeech=abs(hilbert(SpeechSig));
 EnvHilbert=lowpass(AbsHilbertSpeech,f_LP,SpeechFs);
@@ -73,16 +73,40 @@ for i=1:length(ha)
     set(ha(i),'Position',pos);
 end
 %% Envelope + BPF (for EEG later analysis)
-EnvRectDelta=FnBPF(EnvRect,SpeechFs,f_delta);
-EnvRectTheta=FnBPF(EnvRect,SpeechFs,f_theta);
+EnvRectDelta=FnBPF_ChebyII(RectSpeech,SpeechFs,f_delta);
+EnvRectTheta=FnBPF_ChebyII(RectSpeech,SpeechFs,f_theta);
 
 
-EnvSqDelta=FnBPF(EnvSq,SpeechFs,f_delta);
-EnvSqTheta=FnBPF(EnvSq,SpeechFs,f_theta);
+EnvSqDelta=FnBPF_ChebyII(SqSpeech,SpeechFs,f_delta);
+EnvSqTheta=FnBPF_ChebyII(SqSpeech,SpeechFs,f_theta);
 
-EnvAbsHilbertDelta=FnBPF(EnvHilbert,SpeechFs,f_delta);
-EnvAbsHilbertTheta=FnBPF(EnvHilbert,SpeechFs,f_theta);
+EnvAbsHilbertDelta=FnBPF_ChebyII(AbsHilbertSpeech,SpeechFs,f_delta);
+EnvAbsHilbertTheta=FnBPF_ChebyII(AbsHilbertSpeech,SpeechFs,f_theta);
+%% Plot Band-Pass Filtered Envelopes (Delta & Theta)
 
+figure('Color','w','Position',[200 200 900 600]);
+
+subplot(2,2,1)
+plot(Time, EnvRectDelta, 'k', 'LineWidth', 1);
+title('Rectified Envelope - Delta (0.5–4 Hz)')
+xlabel('Time (s)'); box off; xlim([Time(1) Time(end)])
+
+subplot(2,2,2)
+plot(Time, EnvRectTheta, 'k', 'LineWidth', 1);
+title('Rectified Envelope - Theta (4–8 Hz)')
+xlabel('Time (s)'); box off; xlim([Time(1) Time(end)])
+
+subplot(2,2,3)
+plot(Time, EnvSqDelta, 'k', 'LineWidth', 1);
+title('Squared Envelope - Delta (0.5–4 Hz)')
+xlabel('Time (s)'); box off; xlim([Time(1) Time(end)])
+
+subplot(2,2,4)
+plot(Time, EnvSqTheta, 'k', 'LineWidth', 1);
+title('Squared Envelope - Theta (4–8 Hz)')
+xlabel('Time (s)'); box off; xlim([Time(1) Time(end)])
+
+set(gca,'FontSize',9)
 %4-Band-wise (gammatone filterbank)
 
 
