@@ -15,15 +15,17 @@ Ws(1) = max(Ws(1), 0);
 Ws(2) = min(Ws(2), 1);
 
 % Design Chebyshev Type II filter
-[n,Wn]=cheb2ord(Wp,Ws,.5,Astop);   % .5 dB passband ripple (typical placeholder)
-[b,a]=cheby2(n,Astop,Wn);
-% Apply zero-phase (recommended to convert to SOS for stability)
-[sos, g] = tf2sos(b, a);
-XFilt = filtfilt(sos, g, x);
+[n,Wn]=cheb2ord(Wp,Ws,1,Astop);   % .5 dB passband ripple (typical placeholder)
+[A,B,C,D]=cheby2(n,Astop,Wn);
 
-fvtool(sos);
-% Optional: inspect frequency response
-freqz(b,a,1024,fs);
+[sos,g] = ss2sos(A,B,C,D);
+
+% [sos, g] = tf2sos(b, a);
+XFilt = filtfilt(sos, g,x);
+
+fvtool(sos,'Fs', fs);
+% % Optional: inspect frequency response
+% freqz(b,a,1024,fs);
 title('Chebyshev Type II Bandpass Filter');
 
 end
